@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { injectMutation, injectQuery } from '@ngneat/query';
 import { NewProduct, Product } from './product';
 
-const API_URL = 'https://fakestoreapi.com/products';
+export const API_URL = 'https://fakestoreapi.com/products';
 
 @Injectable({ providedIn: 'root' })
 export class ProductsApi {

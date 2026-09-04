@@ -5,10 +5,8 @@ import { provideQueryClient, QueryClient } from '@ngneat/query';
 import { firstValueFrom } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { vi } from 'vitest';
-import { ProductsApi } from './products-api';
+import { API_URL, ProductsApi } from './products-api';
 import { NewProduct, Product } from './product';
-
-const API_URL = 'https://fakestoreapi.com/products';
 
 const product: Product = {
   id: 1,
