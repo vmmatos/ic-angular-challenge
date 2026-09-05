@@ -5,7 +5,7 @@ import { injectQueryClient, provideQueryClient, QueryClient } from '@ngneat/quer
 import { firstValueFrom } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { vi } from 'vitest';
-import { API_URL, PRODUCTS_QUERY_KEY, ProductsApi } from './products-api';
+import { API_URL, PRODUCTS_QUERY_KEY, productQueryKey, ProductsApi } from './products-api';
 import { NewProduct, Product } from './product';
 
 const product: Product = {
@@ -127,5 +127,33 @@ describe('ProductsApi', () => {
     await pending;
 
     expect(queryClient.getQueryData(PRODUCTS_QUERY_KEY)).toBeUndefined();
+  });
+
+  it('createProduct() seeds the single-product cache for the created id', async () => {
+    const { mutateAsync } = api.createProduct();
+    const created: Product = { ...product, id: 21 };
+    const pending = mutateAsync(newProduct);
+
+    const req = await vi.waitFor(() => httpMock.expectOne(API_URL));
+    req.flush(created);
+    await pending;
+
+    expect(queryClient.getQueryData(productQueryKey(21))).toEqual(created);
+  });
+
+  it('createProduct() falls back to the submitted rating when the API response omits it', async () => {
+    const { mutateAsync } = api.createProduct();
+    const pending = mutateAsync(newProduct);
+
+    const req = await vi.waitFor(() => httpMock.expectOne(API_URL));
+    const { rating: _rating, ...responseWithoutRating } = product;
+    req.flush(responseWithoutRating);
+
+    const created = await pending;
+    expect(created.rating).toEqual(newProduct.rating);
+    expect(queryClient.getQueryData(productQueryKey(product.id))).toEqual({
+      ...responseWithoutRating,
+      rating: newProduct.rating,
+    });
   });
 });
