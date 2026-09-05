@@ -6,4 +6,8 @@ export const routes: Routes = [
     path: 'products',
     loadChildren: () => import('./products/products.routes').then((m) => m.PRODUCTS_ROUTES),
   },
+  {
+    path: '**',
+    loadComponent: () => import('./error/error-page').then((m) => m.ErrorPage),
+  },
 ];
