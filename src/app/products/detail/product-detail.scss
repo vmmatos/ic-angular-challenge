@@ -1,0 +1,48 @@
+.detail {
+  padding: 1.5rem;
+}
+
+.detail__back {
+  display: inline-block;
+  margin-bottom: 1.5rem;
+  color: inherit;
+}
+
+.detail__layout {
+  display: grid;
+  grid-template-columns: minmax(200px, 320px) 1fr;
+  gap: 2rem;
+  align-items: start;
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.detail__image {
+  width: 100%;
+  height: 320px;
+  object-fit: contain;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+}
+
+.detail__category {
+  margin: 0 0 0.5rem;
+  color: #555;
+  font-size: 0.875rem;
+  text-transform: capitalize;
+}
+
+.detail__rating {
+  color: #555;
+}
+
+.detail__price {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.detail__description {
+  line-height: 1.5;
+}
