@@ -1,1 +1,25 @@
-<p>Product detail — coming in M3.</p>
+<section class="detail" aria-labelledby="detail-heading">
+  @if (pending()) {
+    <p role="status">Loading product…</p>
+  } @else if (notFound()) {
+    <div class="state state--not-found" role="alert">
+      <h2 id="detail-heading">Product not found</h2>
+      <p>We couldn't find the product you're looking for.</p>
+      <a routerLink="/products">&larr; Back to products</a>
+    </div>
+  } @else if (product(); as product) {
+    <a class="detail__back" routerLink="/products">&larr; Back to products</a>
+    <div class="detail__layout">
+      <img class="detail__image" [src]="product.image" [alt]="product.title" />
+      <div class="detail__content">
+        <p class="detail__category">{{ product.category }}</p>
+        <h2 id="detail-heading">{{ product.title }}</h2>
+        <p class="detail__rating">
+          {{ product.rating.rate }} ★ ({{ product.rating.count }} reviews)
+        </p>
+        <p class="detail__price">{{ product.price | currency }}</p>
+        <p class="detail__description">{{ product.description }}</p>
+      </div>
+    </div>
+  }
+</section>
