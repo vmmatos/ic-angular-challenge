@@ -1,5 +1,8 @@
 <section class="overview" aria-labelledby="overview-heading">
-  <h2 id="overview-heading">Products</h2>
+  <div class="overview__header">
+    <h2 id="overview-heading">Products</h2>
+    <a class="overview__add" routerLink="/products/new">Add product</a>
+  </div>
 
   @if (result().isPending) {
     <p role="status">Loading products…</p>
