@@ -1,6 +1,7 @@
 import { Component, computed, inject } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ErrorPage } from '../../error/error-page';
 import { ProductsApi } from '../data/products-api';
 
 function parseId(raw: string | null): number | null {
@@ -10,7 +11,7 @@ function parseId(raw: string | null): number | null {
 
 @Component({
   selector: 'app-product-detail',
-  imports: [CurrencyPipe, RouterLink],
+  imports: [CurrencyPipe, RouterLink, ErrorPage],
   templateUrl: './product-detail.html',
   styleUrl: './product-detail.scss',
 })

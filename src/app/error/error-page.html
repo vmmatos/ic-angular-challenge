@@ -1,6 +1,6 @@
-<section class="error-page" aria-labelledby="error-heading">
-  <p class="error-page__status">{{ status }}</p>
-  <h2 id="error-heading">{{ heading }}</h2>
-  <p>{{ message }}</p>
+<section class="error-page" role="alert" aria-labelledby="error-heading">
+  <p class="error-page__status">{{ status() }}</p>
+  <h2 id="error-heading">{{ heading() }}</h2>
+  <p>{{ message() }}</p>
   <a routerLink="/products">Back to products</a>
 </section>
