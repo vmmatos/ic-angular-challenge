@@ -1,1 +1,98 @@
-<p>Add product — coming in M4.</p>
+<section class="create" aria-labelledby="create-heading">
+  <h2 id="create-heading">Add product</h2>
+
+  @if (result().isSuccess) {
+    <div class="state state--success" role="status">
+      <p>&ldquo;{{ result().data?.title }}&rdquo; was created.</p>
+      <a routerLink="/products">View products</a>
+    </div>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="field" [class.field--invalid]="fieldInvalid('title')">
+      <label for="title">Title</label>
+      <input
+        id="title"
+        type="text"
+        formControlName="title"
+        (blur)="form.controls.title.markAsTouched()"
+        [attr.aria-invalid]="fieldInvalid('title') || null"
+        [attr.aria-describedby]="fieldInvalid('title') ? 'title-error' : null"
+      />
+      @if (fieldInvalid('title')) {
+        <p class="field__error" id="title-error">{{ fieldErrorMessage('title') }}</p>
+      }
+    </div>
+
+    <div class="field" [class.field--invalid]="fieldInvalid('price')">
+      <label for="price">Price</label>
+      <input
+        id="price"
+        type="number"
+        step="0.01"
+        formControlName="price"
+        (blur)="form.controls.price.markAsTouched()"
+        [attr.aria-invalid]="fieldInvalid('price') || null"
+        [attr.aria-describedby]="fieldInvalid('price') ? 'price-error' : null"
+      />
+      @if (fieldInvalid('price')) {
+        <p class="field__error" id="price-error">{{ fieldErrorMessage('price') }}</p>
+      }
+    </div>
+
+    <div class="field" [class.field--invalid]="fieldInvalid('description')">
+      <label for="description">Description</label>
+      <textarea
+        id="description"
+        rows="4"
+        formControlName="description"
+        (blur)="form.controls.description.markAsTouched()"
+        [attr.aria-invalid]="fieldInvalid('description') || null"
+        [attr.aria-describedby]="fieldInvalid('description') ? 'description-error' : null"
+      ></textarea>
+      @if (fieldInvalid('description')) {
+        <p class="field__error" id="description-error">{{ fieldErrorMessage('description') }}</p>
+      }
+    </div>
+
+    <div class="field" [class.field--invalid]="fieldInvalid('category')">
+      <label for="category">Category</label>
+      <input
+        id="category"
+        type="text"
+        formControlName="category"
+        (blur)="form.controls.category.markAsTouched()"
+        [attr.aria-invalid]="fieldInvalid('category') || null"
+        [attr.aria-describedby]="fieldInvalid('category') ? 'category-error' : null"
+      />
+      @if (fieldInvalid('category')) {
+        <p class="field__error" id="category-error">{{ fieldErrorMessage('category') }}</p>
+      }
+    </div>
+
+    <div class="field" [class.field--invalid]="fieldInvalid('image')">
+      <label for="image">Image URL</label>
+      <input
+        id="image"
+        type="url"
+        formControlName="image"
+        (blur)="form.controls.image.markAsTouched()"
+        [attr.aria-invalid]="fieldInvalid('image') || null"
+        [attr.aria-describedby]="fieldInvalid('image') ? 'image-error' : null"
+      />
+      @if (fieldInvalid('image')) {
+        <p class="field__error" id="image-error">{{ fieldErrorMessage('image') }}</p>
+      }
+    </div>
+
+    @if (result().isError) {
+      <div class="state state--error" role="alert">
+        <p>We couldn't create the product. Please try again.</p>
+      </div>
+    }
+
+    <button type="submit" [disabled]="submitting()">
+      {{ submitting() ? 'Creating…' : 'Create product' }}
+    </button>
+  </form>
+</section>

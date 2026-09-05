@@ -1,11 +1,11 @@
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { provideQueryClient, QueryClient } from '@ngneat/query';
+import { injectQueryClient, provideQueryClient, QueryClient } from '@ngneat/query';
 import { firstValueFrom } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { vi } from 'vitest';
-import { API_URL, ProductsApi } from './products-api';
+import { API_URL, PRODUCTS_QUERY_KEY, productQueryKey, ProductsApi } from './products-api';
 import { NewProduct, Product } from './product';
 
 const product: Product = {
@@ -30,6 +30,7 @@ const newProduct: NewProduct = {
 describe('ProductsApi', () => {
   let api: ProductsApi;
   let httpMock: HttpTestingController;
+  let queryClient: QueryClient;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -43,6 +44,7 @@ describe('ProductsApi', () => {
     });
     api = TestBed.inject(ProductsApi);
     httpMock = TestBed.inject(HttpTestingController);
+    queryClient = TestBed.runInInjectionContext(() => injectQueryClient());
   });
 
   afterEach(() => httpMock.verify());
@@ -100,5 +102,58 @@ describe('ProductsApi', () => {
     req.flush('failure', { status: 500, statusText: 'Server Error' });
 
     await expect(created).rejects.toBeTruthy();
+  });
+
+  it('createProduct() prepends the created product to an existing products cache', async () => {
+    queryClient.setQueryData(PRODUCTS_QUERY_KEY, [product]);
+
+    const { mutateAsync } = api.createProduct();
+    const created: Product = { ...product, id: 2, title: 'New product' };
+    const pending = mutateAsync(newProduct);
+
+    const req = await vi.waitFor(() => httpMock.expectOne(API_URL));
+    req.flush(created);
+    await pending;
+
+    expect(queryClient.getQueryData(PRODUCTS_QUERY_KEY)).toEqual([created, product]);
+  });
+
+  it('createProduct() does not seed the products cache when it was never loaded', async () => {
+    const { mutateAsync } = api.createProduct();
+    const pending = mutateAsync(newProduct);
+
+    const req = await vi.waitFor(() => httpMock.expectOne(API_URL));
+    req.flush(product);
+    await pending;
+
+    expect(queryClient.getQueryData(PRODUCTS_QUERY_KEY)).toBeUndefined();
+  });
+
+  it('createProduct() seeds the single-product cache for the created id', async () => {
+    const { mutateAsync } = api.createProduct();
+    const created: Product = { ...product, id: 21 };
+    const pending = mutateAsync(newProduct);
+
+    const req = await vi.waitFor(() => httpMock.expectOne(API_URL));
+    req.flush(created);
+    await pending;
+
+    expect(queryClient.getQueryData(productQueryKey(21))).toEqual(created);
+  });
+
+  it('createProduct() falls back to the submitted rating when the API response omits it', async () => {
+    const { mutateAsync } = api.createProduct();
+    const pending = mutateAsync(newProduct);
+
+    const req = await vi.waitFor(() => httpMock.expectOne(API_URL));
+    const { rating: _rating, ...responseWithoutRating } = product;
+    req.flush(responseWithoutRating);
+
+    const created = await pending;
+    expect(created.rating).toEqual(newProduct.rating);
+    expect(queryClient.getQueryData(productQueryKey(product.id))).toEqual({
+      ...responseWithoutRating,
+      rating: newProduct.rating,
+    });
   });
 });

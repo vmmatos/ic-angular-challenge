@@ -2,6 +2,27 @@
   padding: 1.5rem;
 }
 
+.overview__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.overview__add {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  background: #1a73e8;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+
+  &:focus-visible {
+    outline: 3px solid #1a73e8;
+    outline-offset: 2px;
+  }
+}
+
 .state {
   display: flex;
   flex-direction: column;

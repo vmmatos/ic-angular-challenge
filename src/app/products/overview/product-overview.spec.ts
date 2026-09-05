@@ -59,6 +59,18 @@ describe('ProductOverview', () => {
     await settle(fixture);
   });
 
+  it('renders a link to the product creation form', async () => {
+    const fixture = TestBed.createComponent(ProductOverview);
+    fixture.detectChanges();
+
+    httpMock.expectOne(API_URL).flush([product]);
+    await settle(fixture);
+
+    const compiled = fixture.nativeElement as HTMLElement;
+    const addLink = compiled.querySelector<HTMLAnchorElement>('.overview__add');
+    expect(addLink?.getAttribute('href')).toBe('/products/new');
+  });
+
   it('renders a card per product on success', async () => {
     const fixture = TestBed.createComponent(ProductOverview);
     fixture.detectChanges();
