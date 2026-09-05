@@ -1,1 +1,32 @@
-<p>Product overview — coming in M2.</p>
+<section class="overview" aria-labelledby="overview-heading">
+  <h2 id="overview-heading">Products</h2>
+
+  @if (result().isPending) {
+    <p role="status">Loading products…</p>
+  } @else if (result().isError) {
+    <div class="state state--error" role="alert">
+      <p>We couldn't load the products. Please try again.</p>
+      <button type="button" (click)="retry()">Retry</button>
+    </div>
+  } @else if (cards().length === 0) {
+    <p role="status">No products found.</p>
+  } @else {
+    <ul class="product-grid">
+      @for (product of cards(); track product.id) {
+        <li>
+          <a class="product-card" [routerLink]="['/products', product.id]">
+            <img
+              class="product-card__image"
+              [src]="product.image"
+              [alt]="product.title"
+              loading="lazy"
+            />
+            <h3 class="product-card__title">{{ product.title }}</h3>
+            <p class="product-card__price">{{ product.price | currency }}</p>
+            <p class="product-card__description">{{ product.shortDescription }}</p>
+          </a>
+        </li>
+      }
+    </ul>
+  }
+</section>
