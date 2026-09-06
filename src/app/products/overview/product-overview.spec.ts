@@ -81,6 +81,19 @@ describe('ProductOverview', () => {
     expect(addLink?.getAttribute('href')).toBe('/products/new');
   });
 
+  it('refetches products on a fresh mount instead of only serving a stale cache', async () => {
+    const fixture1 = TestBed.createComponent(ProductOverview);
+    fixture1.detectChanges();
+    httpMock.expectOne(API_URL).flush([product]);
+    await settle(fixture1);
+    fixture1.destroy();
+
+    const fixture2 = TestBed.createComponent(ProductOverview);
+    fixture2.detectChanges();
+    httpMock.expectOne(API_URL).flush([product]);
+    await settle(fixture2);
+  });
+
   it('renders a card per product on success, with a decorative image and a rating', async () => {
     const fixture = TestBed.createComponent(ProductOverview);
     fixture.detectChanges();
