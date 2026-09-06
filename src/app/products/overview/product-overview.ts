@@ -6,6 +6,7 @@ import { ProductRating } from '../ui/product-rating';
 import { truncate } from './truncate';
 
 const DESCRIPTION_LIMIT = 110;
+const SKELETON_CARD_COUNT = 8;
 
 @Component({
   selector: 'app-product-overview',
@@ -20,6 +21,8 @@ export class ProductOverview {
   category = input('');
 
   result = this.#query.result;
+
+  skeletonRows = Array.from({ length: SKELETON_CARD_COUNT });
 
   #products = computed(() => this.result().data ?? []);
 

@@ -5,7 +5,20 @@
   </div>
 
   @if (result().isPending) {
-    <p role="status">Loading products…</p>
+    <p class="sr-only" role="status">Loading products…</p>
+    <ul class="product-grid" aria-hidden="true">
+      @for (row of skeletonRows; track $index) {
+        <li>
+          <div class="product-card product-card--skeleton">
+            <div class="skeleton product-card__image"></div>
+            <div class="skeleton product-card__title" style="width: 70%; height: 1rem"></div>
+            <div class="skeleton product-card__price" style="width: 40%; height: 1rem"></div>
+            <div class="skeleton" style="width: 60%; height: 0.875rem"></div>
+            <div class="skeleton product-card__description" style="height: 2.5rem"></div>
+          </div>
+        </li>
+      }
+    </ul>
   } @else if (result().isError) {
     <div class="state state--error" role="alert">
       <p>We couldn't load the products. Please try again.</p>

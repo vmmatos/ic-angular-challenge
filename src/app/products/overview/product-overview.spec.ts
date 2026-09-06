@@ -64,9 +64,12 @@ describe('ProductOverview', () => {
 
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('[role="status"]')?.textContent).toContain('Loading products');
+    expect(compiled.querySelectorAll('.skeleton').length).toBeGreaterThan(0);
 
     httpMock.expectOne(API_URL).flush([product]);
     await settle(fixture);
+
+    expect(compiled.querySelectorAll('.skeleton').length).toBe(0);
   });
 
   it('renders a link to the product creation form', async () => {
