@@ -1,0 +1,7 @@
+<span class="rating" [attr.aria-label]="label()">
+  <span class="rating__stars" aria-hidden="true">
+    <span class="rating__stars-track">★★★★★</span>
+    <span class="rating__stars-fill" [style.width.%]="percent()">★★★★★</span>
+  </span>
+  <span class="rating__text" aria-hidden="true">{{ rate() }} ({{ count() }})</span>
+</span>
