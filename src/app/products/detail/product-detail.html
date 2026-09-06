@@ -13,9 +13,11 @@
       <div class="detail__content">
         <p class="detail__category">{{ product.category }}</p>
         <h2>{{ product.title }}</h2>
-        <p class="detail__rating">
-          {{ product.rating.rate }} ★ ({{ product.rating.count }} reviews)
-        </p>
+        <app-product-rating
+          class="detail__rating"
+          [rate]="product.rating.rate"
+          [count]="product.rating.count"
+        />
         <p class="detail__price">{{ product.price | currency }}</p>
         <p class="detail__description">{{ product.description }}</p>
       </div>
