@@ -4,6 +4,9 @@
   @if (result().isSuccess) {
     <div class="state state--success" role="status">
       <p>&ldquo;{{ result().data?.title }}&rdquo; was created.</p>
+      <p class="state__note">
+        The Fake Store API doesn't persist new products, so it won't appear in the catalogue below.
+      </p>
       <a routerLink="/products">View products</a>
     </div>
   }

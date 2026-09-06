@@ -130,7 +130,7 @@ describe('ProductCreate', () => {
     expect(compiled.querySelector(`#${describedById}`)?.textContent).toBeTruthy();
   });
 
-  it('submits a valid form, prepends success feedback, and resets the form', async () => {
+  it('submits a valid form, shows success feedback, and resets the form', async () => {
     const fixture = TestBed.createComponent(ProductCreate);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
@@ -161,6 +161,7 @@ describe('ProductCreate', () => {
     });
 
     expect(compiled.querySelector('[role="status"]')?.textContent).toContain('New product');
+    expect(compiled.querySelector('.state__note')?.textContent).toContain("doesn't persist");
     expect(submitButton.disabled).toBe(false);
     expect(compiled.querySelector<HTMLInputElement>('#title')?.value).toBe('');
   });
