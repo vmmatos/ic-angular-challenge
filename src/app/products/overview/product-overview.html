@@ -5,31 +5,83 @@
   </div>
 
   @if (result().isPending) {
-    <p role="status">Loading products…</p>
+    <p class="sr-only" role="status">Loading products…</p>
+    <ul class="product-grid" aria-hidden="true">
+      @for (row of skeletonRows; track $index) {
+        <li>
+          <div class="product-card product-card--skeleton">
+            <div class="skeleton product-card__image"></div>
+            <div class="skeleton product-card__title" style="width: 70%; height: 1rem"></div>
+            <div class="skeleton product-card__price" style="width: 40%; height: 1rem"></div>
+            <div class="skeleton" style="width: 60%; height: 0.875rem"></div>
+            <div class="skeleton product-card__description" style="height: 2.5rem"></div>
+          </div>
+        </li>
+      }
+    </ul>
   } @else if (result().isError) {
     <div class="state state--error" role="alert">
       <p>We couldn't load the products. Please try again.</p>
       <button type="button" (click)="retry()">Retry</button>
     </div>
-  } @else if (cards().length === 0) {
-    <p role="status">No products found.</p>
   } @else {
-    <ul class="product-grid">
-      @for (product of cards(); track product.id) {
-        <li>
-          <a class="product-card" [routerLink]="['/products', product.id]">
-            <img
-              class="product-card__image"
-              [src]="product.image"
-              [alt]="product.title"
-              loading="lazy"
-            />
-            <h3 class="product-card__title">{{ product.title }}</h3>
-            <p class="product-card__price">{{ product.price | currency }}</p>
-            <p class="product-card__description">{{ product.shortDescription }}</p>
-          </a>
-        </li>
-      }
-    </ul>
+    @if (categories().length > 0) {
+      <nav aria-label="Filter by category">
+        <ul class="categories">
+          <li>
+            <a
+              class="categories__chip"
+              routerLink="/products"
+              [queryParams]="{ category: null }"
+              [attr.aria-current]="category() === '' ? 'true' : null"
+            >
+              All
+            </a>
+          </li>
+          @for (c of categories(); track c) {
+            <li>
+              <a
+                class="categories__chip"
+                routerLink="/products"
+                [queryParams]="{ category: c }"
+                [attr.aria-current]="category() === c ? 'true' : null"
+              >
+                {{ c }}
+              </a>
+            </li>
+          }
+        </ul>
+      </nav>
+    }
+
+    @if (total() === 0) {
+      <p role="status">No products found.</p>
+    } @else if (cards().length === 0) {
+      <div class="state" role="status">
+        <p>No products in this category.</p>
+        <a routerLink="/products" [queryParams]="{ category: null }">Clear filter</a>
+      </div>
+    } @else {
+      <p class="overview__count" role="status">
+        Showing {{ cards().length }} of {{ total() }} products
+      </p>
+      <ul class="product-grid">
+        @for (product of cards(); track product.id) {
+          <li>
+            <a class="product-card" [routerLink]="['/products', product.id]">
+              <img class="product-card__image" [src]="product.image" alt="" loading="lazy" />
+              <h3 class="product-card__title">{{ product.title }}</h3>
+              <p class="product-card__price">{{ product.price | currency }}</p>
+              <app-product-rating
+                class="product-card__rating"
+                [rate]="product.rating.rate"
+                [count]="product.rating.count"
+              />
+              <p class="product-card__description">{{ product.shortDescription }}</p>
+            </a>
+          </li>
+        }
+      </ul>
+    }
   }
 </section>

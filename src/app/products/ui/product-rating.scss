@@ -1,0 +1,31 @@
+:host {
+  display: inline-flex;
+}
+
+.rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.rating__stars {
+  position: relative;
+  display: inline-block;
+  line-height: 1;
+  color: var(--color-border);
+  white-space: nowrap;
+}
+
+.rating__stars-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  color: var(--color-accent);
+  white-space: nowrap;
+}
+
+.rating__text {
+  color: var(--color-muted);
+  font-size: 0.875rem;
+}

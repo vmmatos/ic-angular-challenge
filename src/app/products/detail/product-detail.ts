@@ -3,6 +3,7 @@ import { CurrencyPipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ErrorPage } from '../../error/error-page';
 import { ProductsApi } from '../data/products-api';
+import { ProductRating } from '../ui/product-rating';
 
 function parseId(raw: string | null): number | null {
   const id = Number(raw);
@@ -11,7 +12,7 @@ function parseId(raw: string | null): number | null {
 
 @Component({
   selector: 'app-product-detail',
-  imports: [CurrencyPipe, RouterLink, ErrorPage],
+  imports: [CurrencyPipe, RouterLink, ErrorPage, ProductRating],
   templateUrl: './product-detail.html',
   styleUrl: './product-detail.scss',
 })
