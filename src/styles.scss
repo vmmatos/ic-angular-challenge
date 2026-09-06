@@ -1,1 +1,49 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  --color-accent: #1a73e8;
+  --color-accent-contrast: #fff;
+  --color-danger: #b3261e;
+  --color-success: #1a7f37;
+  --color-border: #e0e0e0;
+  --color-muted: #555;
+  --radius: 8px;
+  --radius-sm: 6px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family:
+    'Nunito',
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    sans-serif;
+  line-height: 1.5;
+  color: #1a1a1a;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.state {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.state--error {
+  color: var(--color-danger);
+}
+
+.state--success {
+  color: var(--color-success);
+}
