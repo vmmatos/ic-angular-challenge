@@ -89,19 +89,25 @@ npm run build    # production build
 ## Trade-offs
 
 - **Categories are derived from the already-loaded product list** (`new Set(products.map(...))`)
-  rather than fetched from `GET /products/categories`. One fewer request, one fewer loading/error
-  state to design for, and a product created in-session under a brand-new category shows up in the
-  filter immediately, because it's reading the same cache the optimistic create writes into. The
-  cost: if the API ever held a category with zero products, it wouldn't appear — acceptable for a
-  catalogue this size, wouldn't be for a large one.
+  rather than fetched from `GET /products/categories`. One fewer request and one fewer
+  loading/error state to design for; the cost is that if the API ever held a category with zero
+  products, it wouldn't appear in the filter — acceptable for a catalogue this size.
 - **The category filter lives in the URL** (`/products?category=jewelery`) rather than a plain
   component signal. It's shareable, survives a reload, and — the concrete reason it mattered here —
   survives navigating into a product's detail page and back. The cost is one extra router option
   (`withComponentInputBinding()`) and reading the filter as an `input()` instead of a private
   signal.
-- **`staleTime: Infinity` on both queries.** The catalogue doesn't change server-side during a
-  session, so there's no reason to ever refetch it in the background — a real product API with
-  concurrent writers would need a real staleness policy instead.
+- **No client-side cache faking.** Verified directly (`curl`) that the Fake Store API's
+  `POST /products` returns a plausible `201` with a new `id`, but a follow-up `GET /products` never
+  includes it — the API doesn't actually persist anything written to it. Earlier in this project
+  the create flow papered over that by writing the "created" response straight into the
+  `@ngneat/query` cache, so it would appear to survive. That's gone: the app now makes no attempt to
+  keep a created item visible afterwards. The create page reports the real request's outcome and
+  says plainly that the item won't show up in the catalogue, and both read queries use the query
+  client's default `staleTime` (0) instead of `Infinity`, so every visit to the overview or a detail
+  page issues a real `GET` rather than serving a cached response indefinitely. What's on screen
+  always matches what the API actually has — at the cost of a network round trip on every
+  navigation, and a create flow that (correctly) can't demonstrate its own result in the list.
 - **Google Fonts over a CDN link, not self-hosted.** One `<link>` in `index.html` versus a
   `@fontsource` build step; the cost is a third-party request and a small self-hosting/privacy
   trade-off a production app might not accept.
@@ -126,11 +132,9 @@ npm run build    # production build
 - **Server-side pagination/search** once the catalogue outgrows a single fetch — worth doing
   together with the `@defer` work above, so scrolling requests the next page instead of the client
   ever holding the entire catalogue in memory.
-- **One honest limitation worth naming**: because the Fake Store API's `POST /products` doesn't
-  actually persist, a product created locally only exists in the `@ngneat/query` cache — it
-  survives navigating around the app (same cache), but not a hard reload, and there's no server
-  record to reconcile against on a future fetch. A real backend removes this entirely; short of
-  that, the next step would be persisting the optimistic entry to `localStorage` so it survives a
-  reload too.
+- **A real backing store for the create flow.** The honest fix for "created products don't show up"
+  isn't more client-side cache tricks (see Trade-offs) — it's a real API to point the form at, e.g.
+  a small backend or `json-server` seeded from the same product shape, so a created product
+  actually persists and a subsequent `GET /products` genuinely includes it.
 - **Playwright smoke test** for the create → list → detail loop, to complement the component-level
   Vitest suite with one true end-to-end path.
