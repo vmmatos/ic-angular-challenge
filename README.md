@@ -56,3 +56,81 @@ To start a local development server, run:
 ```bash
 ng serve
 ```
+
+---
+
+## Running It
+
+```bash
+npm start        # ng serve — http://localhost:4200
+npm test         # vitest, via the Angular CLI unit-test builder
+npm run build    # production build
+```
+
+---
+
+## Architecture
+
+- **Angular 21, standalone, zoneless, signals.** No `NgModule`s, no `Zone.js` change detection —
+  every reactive value is a signal or a `computed()`.
+- **`@ngneat/query` is the state layer.** There is no NgRx, no service-level `BehaviorSubject`
+  cache, no manually-managed loading/error flags. `ProductsApi` (`src/app/products/data/`) wraps
+  three query-cache operations — list, detail, create — and every page reads `result()` directly.
+  The cache _is_ the app's state; a page component's job is to derive view state from it, not to
+  hold its own.
+- **Feature folders.** `src/app/products/{overview,detail,create}/` for the three routed pages,
+  `src/app/products/data/` for the API service and `Product` model, `src/app/products/ui/` for
+  presentational pieces (`ProductRating`) shared across more than one page.
+- **Lazy routes.** Every page is `loadComponent`-ed from `products.routes.ts`, so the initial
+  bundle only pays for the shell and whichever page is loaded first.
+
+---
+
+## Trade-offs
+
+- **Categories are derived from the already-loaded product list** (`new Set(products.map(...))`)
+  rather than fetched from `GET /products/categories`. One fewer request, one fewer loading/error
+  state to design for, and a product created in-session under a brand-new category shows up in the
+  filter immediately, because it's reading the same cache the optimistic create writes into. The
+  cost: if the API ever held a category with zero products, it wouldn't appear — acceptable for a
+  catalogue this size, wouldn't be for a large one.
+- **The category filter lives in the URL** (`/products?category=jewelery`) rather than a plain
+  component signal. It's shareable, survives a reload, and — the concrete reason it mattered here —
+  survives navigating into a product's detail page and back. The cost is one extra router option
+  (`withComponentInputBinding()`) and reading the filter as an `input()` instead of a private
+  signal.
+- **`staleTime: Infinity` on both queries.** The catalogue doesn't change server-side during a
+  session, so there's no reason to ever refetch it in the background — a real product API with
+  concurrent writers would need a real staleness policy instead.
+- **Google Fonts over a CDN link, not self-hosted.** One `<link>` in `index.html` versus a
+  `@fontsource` build step; the cost is a third-party request and a small self-hosting/privacy
+  trade-off a production app might not accept.
+- **Component tests render the real DOM** (`TestBed.createComponent` + `HttpTestingController`)
+  rather than mocking `ProductsApi` or shallow-rendering. Slower to write and to run, but they
+  exercise what the acceptance criteria describe: loading/error/empty states, form validation
+  messages, and the accessible markup — not just that a function was called.
+
+---
+
+## What I'd Do Differently / Next
+
+- **`@defer` on the product grid.** Angular's built-in deferred-loading blocks
+  (`@defer (on viewport)`) are a natural fit for a grid of 20+ cards with images — batch the cards
+  so off-screen ones, and their images, don't cost anything until they're about to be seen. This is
+  the framework-native equivalent of manual `IntersectionObserver` lazy-loading, and the next thing
+  I'd reach for once the catalogue grows past a single screen.
+  - Paired with that: **prefetching the detail route's chunk `on hover`** of a card, so the
+    click-through feels instant even though the page itself is lazy-loaded.
+- **Skeleton placeholders shaped like the real card**, instead of a text "Loading…", to cut layout
+  shift and make the wait feel shorter.
+- **Server-side pagination/search** once the catalogue outgrows a single fetch — worth doing
+  together with the `@defer` work above, so scrolling requests the next page instead of the client
+  ever holding the entire catalogue in memory.
+- **One honest limitation worth naming**: because the Fake Store API's `POST /products` doesn't
+  actually persist, a product created locally only exists in the `@ngneat/query` cache — it
+  survives navigating around the app (same cache), but not a hard reload, and there's no server
+  record to reconcile against on a future fetch. A real backend removes this entirely; short of
+  that, the next step would be persisting the optimistic entry to `localStorage` so it survives a
+  reload too.
+- **Playwright smoke test** for the create → list → detail loop, to complement the component-level
+  Vitest suite with one true end-to-end path.
