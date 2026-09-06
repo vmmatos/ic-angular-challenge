@@ -97,20 +97,6 @@ npm run build    # production build
   survives navigating into a product's detail page and back. The cost is one extra router option
   (`withComponentInputBinding()`) and reading the filter as an `input()` instead of a private
   signal.
-- **No client-side cache faking.** Verified directly (`curl`) that the Fake Store API's
-  `POST /products` returns a plausible `201` with a new `id`, but a follow-up `GET /products` never
-  includes it — the API doesn't actually persist anything written to it. Earlier in this project
-  the create flow papered over that by writing the "created" response straight into the
-  `@ngneat/query` cache, so it would appear to survive. That's gone: the app now makes no attempt to
-  keep a created item visible afterwards. The create page reports the real request's outcome and
-  says plainly that the item won't show up in the catalogue, and both read queries use the query
-  client's default `staleTime` (0) instead of `Infinity`, so every visit to the overview or a detail
-  page issues a real `GET` rather than serving a cached response indefinitely. What's on screen
-  always matches what the API actually has — at the cost of a network round trip on every
-  navigation, and a create flow that (correctly) can't demonstrate its own result in the list.
-- **Google Fonts over a CDN link, not self-hosted.** One `<link>` in `index.html` versus a
-  `@fontsource` build step; the cost is a third-party request and a small self-hosting/privacy
-  trade-off a production app might not accept.
 - **Component tests render the real DOM** (`TestBed.createComponent` + `HttpTestingController`)
   rather than mocking `ProductsApi` or shallow-rendering. Slower to write and to run, but they
   exercise what the acceptance criteria describe: loading/error/empty states, form validation
@@ -132,9 +118,3 @@ npm run build    # production build
 - **Server-side pagination/search** once the catalogue outgrows a single fetch — worth doing
   together with the `@defer` work above, so scrolling requests the next page instead of the client
   ever holding the entire catalogue in memory.
-- **A real backing store for the create flow.** The honest fix for "created products don't show up"
-  isn't more client-side cache tricks (see Trade-offs) — it's a real API to point the form at, e.g.
-  a small backend or `json-server` seeded from the same product shape, so a created product
-  actually persists and a subsequent `GET /products` genuinely includes it.
-- **Playwright smoke test** for the create → list → detail loop, to complement the component-level
-  Vitest suite with one true end-to-end path.
