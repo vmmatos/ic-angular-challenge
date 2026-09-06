@@ -3,6 +3,22 @@
   min-height: 100dvh;
 }
 
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 0.5rem;
+  z-index: 10;
+  padding: 0.5rem 1rem;
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  text-decoration: none;
+
+  &:focus {
+    top: 0;
+  }
+}
+
 .app-header {
   padding: 1rem 1.5rem;
   border-bottom: 1px solid #e2e2e2;
@@ -15,4 +31,8 @@
 
 main {
   padding: 1.5rem;
+
+  &:focus-visible {
+    outline: none;
+  }
 }
